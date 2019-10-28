@@ -22,7 +22,7 @@ with open('Республика Татарстан.dot','w') as dot:
     dot.write('\t" " [shape = none];\n\toverlap = false;\n\tsep=-0.8\n')
     for mat, val in tatars.items():
         if mat != "avg":
-            fontsize = val * 30 if val > 0 else 15
+            fontsize = 30 * val ** 2 if val > 0 else 10
             dot.write('\t"%s" [shape = none, fontsize = %s, fontname="sans"]\n' % (mat.replace(' ','\\n'), fontsize))
     for mat, val in russia.items():
         if mat != "avg":

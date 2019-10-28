@@ -46,12 +46,12 @@ _instr = """0.75	Сельское, лесное хозяйство, охота, 
 0.33	Деятельность в области здравоохранения и социальных услуг	здравоохранение	медицина	социальные услуги	больница	врач	стационар	лечение	пациент																							
 0.25	Деятельность в области культуры, спорта, организации досуга и развлечений	культура	спорт	искусство	развлечения	библиотеки	архивы	музеи	отдых																							"""
 
+#_instr = """0.67	Строительство	Строительство зданий	Строительство инженерных сооружений	Работы строительные специализированные	жилищное строительство	строительство																										"""
 
 metrix = [ x.split('\t')[1:] for x in _instr.lower().split('\n') ]
 weight = [ float(x.split('\t')[0]) for x in _instr.lower().split('\n') ]
 
 rez = {}
-p = 0
 for mat in metrix:
     row = {}
     for reg in regions.keys():
@@ -62,15 +62,13 @@ for mat in metrix:
             for var in mat:
                 dx = compare(var, term.lower()) if var else 0
                 if dx > 0.6999:
-                    found += [[term, round(i/L,2), dx]]
+                    found += [[term, 1 - (i / L), dx]]
             i += 1
         if found:
             pos = np.average([ _[1] for _ in found ])
-            if pos < 0.8:
-                row.update({reg:(1-pos)*weight[p]})
+            row.update({reg:pos})
     
     rez.update({mat[0]:row})
-    p += 1
     
 dump(rez, 'test1.json')
             
