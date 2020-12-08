@@ -5,13 +5,11 @@ from nltk.tokenize import SpaceTokenizer as ST
 from pymorphy2 import MorphAnalyzer
 from utilites import load, dump, compare, compare_phrase
 from math import exp, pow
-from bs4 import BeautifulSoup as BS
-from requests import get
 
 import re
 
 ngrams = load('ngrams.json')
-to_upper_list = ['ВВП', 'ЕГЭ', 'РФ', 'ОАО', 'АПК', 'ВСТО', 'ВТО', 'ЦФО','СЗФО','ЮФО','СКФО','ПФО','УрФО','СФО','ДФО','ДВФО',]
+to_upper_list = ['ВВП', 'ЕГЭ', 'РФ', 'ОАО', 'ЗАО', 'АПК', 'ВСТО', 'ВТО', 'ЦФО','СЗФО','ЮФО','СКФО','ПФО','УрФО','СФО','ДФО','ДВФО',]
 
 ma = MorphAnalyzer()
 pst = PST()
@@ -43,18 +41,24 @@ def term_normal_form(term):
             return out.normal_form.capitalize()
     else:
         rez = []
-        for ngram, count in ngrams:
-            last = ngram.split()[-1]
-            w = 1
-            for var in ma.parse(last):
-                if var.normal_form == var:
-                    w = 1.1
-                    break
-            k = compare_phrase(ngram, str(term)) * w
-            rez += [(k, ngram)]
-        
-        k, out = sorted(rez, key=lambda x: x[0])[-1]
-        print(out, '|', str(term), '|', k)
+        ngram_a = str(term)
+        ngram_a_4 = ngram_a[0:4].lower()
+        for ngram_b, count in ngrams:
+            if ngram_a_4 == ngram_b[0:4].lower():
+                last = ngram_b.split()[-1]
+                w = 1
+                for var in ma.parse(last):
+                    if var.normal_form == var:
+                        w = 1.1
+                        break
+                k = compare_phrase(ngram_b, ngram_a) * w
+                rez += [(k, ngram_b)]
+        try:
+            k, out = sorted(rez, key=lambda x: x[0])[-1]
+            print(out, '|', str(term), '|', k)
+        except IndexError:
+            k = 0
+            
         if k > 0:
             return out[0].upper() + out[1:]
         else:
@@ -75,16 +79,14 @@ for txt in glob('txt/*'):
                 print('upd', term)
                 terms.update({term[0]:term[1]})
     
-    sorted_terms = sorted(terms.items(), key=lambda x: x[1], reverse=1)
+    sorted_terms = sorted(( x for x in terms.items() if x[0] != 'test' ), key=lambda x: x[1], reverse=1)
     with open("%s.dot" % reg, 'w') as graph:
         graph.write("digraph g {\n")	
         graph.write("\toverlap = false;\n");
         graph.write("\tsep=-0.8;\n");
         for word, weight in sorted_terms:
-            if word != 'test':
-                graph.write('\t"%s" [shape = none, fontsize = %s, fontname=\"sans\"]\n' % (word, norm(weight)));
+            graph.write('\t"%s" [shape = none, fontsize = %s, fontname=\"sans\"]\n' % (word, norm(weight)));
         n0 = sorted_terms[0][0]
         for word, weight in sorted_terms:
-            if word != 'test':
-                graph.write('\t"%s" -> "%s" [style=invis, len=%s]\n' % (n0, word, 1/norm(weight)))
+            graph.write('\t"%s" -> "%s" [style=invis, len=%s]\n' % (n0, word, 1/norm(weight)))
         graph.write("}\n")
