@@ -37,5 +37,16 @@ def compare(S1,S2):
 
     return count/max(len(S1), len(S2))
 
+def compare_phrase(P1, P2):
+    wa = P1.split()
+    wb = P2.split()
+    if len(wa) == len(wb):
+        k = 1
+        for a, b in zip(wa, wb):
+            k *= compare(a, b)
+    else:
+        k = 0
+    return k
+    
 if __name__ == "__main__":
     print(compare('привет', 'првиет'))

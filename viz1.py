@@ -3,7 +3,11 @@ from utilites import load, dump, compare
 
 _in = load('test1.json')
 регионы = load('регионы.json')
+rf = load('rf.json')
 
+for k in rf.keys():
+    _in[k].update({'Российская Федерация':rf[k]})
+    
 data = {}
 for reg_a in регионы:
     row = {}

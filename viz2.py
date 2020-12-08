@@ -4,7 +4,7 @@ from utilites import load, dump, compare
 _in = load('test2.json')
 
 russia = _in['Российская Федерация']
-tatars = _in['Республика Татарстан']
+tatars = _in['Пермский край']
 
 with open('Российская Федерация.dot','w') as dot:
     dot.write("digraph g {\n")
@@ -17,7 +17,7 @@ with open('Российская Федерация.dot','w') as dot:
             dot.write('\t" " -> "%s" [style=invis] \n' % mat.replace(' ','\\n'))
     dot.write("}\n")
         
-with open('Республика Татарстан.dot','w') as dot:
+with open('Пермский край.dot','w') as dot:
     dot.write("digraph g {\n")
     dot.write('\t" " [shape = none];\n\toverlap = false;\n\tsep=-0.8\n')
     for mat, val in tatars.items():
